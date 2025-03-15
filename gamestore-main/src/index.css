@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --discord-primary: #5865F2;
+  --discord-bg: #36393f;
+  --discord-dark: #1e2124;
+}
+
+@layer base {
+  html {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  p, span, a, button, input, textarea {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply text-gray-700 font-medium transition-all duration-200 hover:text-primary-600 hover:scale-105;
+  }
+}
+
+/* Colores pastel para las secciones principales */
+.bg-main-section {
+  background-color: #000000; /* Cambiado a negro */
+}
+
+.bg-secondary-section {
+  background-color: #fdf2f8; /* Rosa pastel muy suave */
+}
+
+.bg-featured-section {
+  background-color: #f0fdf4; /* Verde pastel muy suave */
+}
+
+.bg-categories-section {
+  background-color: #fff8f1; /* Naranja pastel muy suave */
+}
+
+.hero-background {
+  background-image: url('https://imgur.com/sHZUG7I.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll */
+  will-change: transform; /* Optimiza el rendimiento del scroll */
+}
+
+.hero-overlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.text-discord {
+  color: var(--discord-primary);
+}
+
+.bg-discord {
+  background-color: var(--discord-primary);
+}
+
+.border-discord {
+  border-color: var(--discord-primary);
+}
+
+.hover\:border-discord:hover {
+  border-color: var(--discord-primary);
+}
+
+/* Estilos para el carrusel de testimonios */
+.testimonial-carousel {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  cursor: ew-resize;
+  position: relative;
+  overflow: visible;
+}
+
+.testimonial-carousel:active {
+  cursor: grabbing;
+}
+
+.testimonial-carousel::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 24px;
+  background-color: var(--discord-primary);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.testimonial-carousel:hover::before {
+  opacity: 0.5;
+}
+
+/* Animaciones suaves para el arrastre */
+.testimonial-carousel > * {
+  transition: transform 0.3s ease;
+}
+
+.testimonial-carousel.dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+}
+
+.testimonial-carousel.dragging > * {
+  transition: none;
+}
+
+/* Indicadores de navegación tipo línea */
+.carousel-indicator {
+  height: 2px;
+  background: var(--discord-primary);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+.carousel-indicator:hover {
+  height: 3px;
+  background: var(--discord-primary);
+  box-shadow: 0 0 8px var(--discord-primary);
+}
+
+/* Animación de brillo para los bordes de las tarjetas de testimonios */
+@keyframes borderGlow {
+  0% {
+    border-color: var(--discord-primary);
+    box-shadow: 0 0 10px var(--discord-primary);
+  }
+  50% {
+    border-color: #7289da;
+    box-shadow: 0 0 20px #7289da;
+  }
+  100% {
+    border-color: var(--discord-primary);
+    box-shadow: 0 0 10px var(--discord-primary);
+  }
+}
+
+.hover\:animate-border-glow:hover {
+  animation: borderGlow 2s infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+

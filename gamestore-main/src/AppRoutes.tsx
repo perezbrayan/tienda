@@ -12,10 +12,17 @@ import VBucksManager from './pages/VBucksManager';
 import UserManager from './pages/UserManager';
 import Checkout from './pages/Checkout';
 import LeagueAccounts from './components/LeagueAccounts';
+import HomePage from './pages/HomePage';
+import Shop from './pages/Shop';
+import OrderSuccess from './pages/OrderSuccess';
 
 const AppRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/shop" element={<Shop />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/" element={<Home />} />
       <Route path="/fortnite-shop" element={<FortniteShop />} />
       <Route path="/bot" element={<Bot />} />
@@ -26,10 +33,9 @@ const AppRoutes = () => {
       <Route path="/admin" element={<AdminPanel />} />
       <Route path="/admin/vbucks" element={<VBucksManager />} />
       <Route path="/admin/users" element={<UserManager />} />
-      <Route path="/checkout" element={<Checkout />} />
       <Route path="/league-accounts" element={<LeagueAccounts />} />
     </Routes>
   );
 };
 
-export default AppRoutes; 
+export default AppRoutes;

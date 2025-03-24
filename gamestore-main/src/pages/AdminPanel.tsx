@@ -114,10 +114,10 @@ const AdminPanel = () => {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', pt: 12 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#003554', pt: 12 }}>
       <Container maxWidth="xl">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6 }}>
-          <Typography variant="h4" sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>
+          <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold' }}>
             PANEL DE ADMINISTRACIÓN
           </Typography>
           <Button
@@ -160,7 +160,7 @@ const AdminPanel = () => {
               <Grid item xs={12} sm={6} md={4} key={item.id}>
                 <Box
                   sx={{
-                    bgcolor: '#f8f9fa',
+                    bgcolor: '#051923',
                     borderRadius: 3,
                     p: 4,
                     textAlign: 'center',
@@ -169,6 +169,7 @@ const AdminPanel = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     transition: 'transform 0.2s',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
                     '&:hover': {
                       transform: 'translateY(-5px)',
                       cursor: 'pointer'
@@ -196,7 +197,7 @@ const AdminPanel = () => {
                   <Typography
                     variant="h6"
                     sx={{
-                      color: '#1a1a1a',
+                      color: 'white',
                       fontWeight: 'bold',
                       mb: 1
                     }}
@@ -206,7 +207,7 @@ const AdminPanel = () => {
                   <Typography
                     variant="body2"
                     sx={{
-                      color: '#666666',
+                      color: '#a0aec0',
                       mb: 3
                     }}
                   >
@@ -215,12 +216,12 @@ const AdminPanel = () => {
                   <Button
                     fullWidth
                     sx={{
-                      bgcolor: '#1a1a1a',
+                      bgcolor: '#00bcd4',
                       color: 'white',
                       py: 1.5,
                       borderRadius: 2,
                       '&:hover': {
-                        bgcolor: '#333333'
+                        bgcolor: '#00838f'
                       }
                     }}
                   >

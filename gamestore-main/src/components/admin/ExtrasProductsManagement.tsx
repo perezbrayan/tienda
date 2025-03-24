@@ -24,6 +24,7 @@ import {
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { API_URL } from '../../config/constants';
 import { toast } from 'react-hot-toast';
+import { MdEdit, MdDelete } from 'react-icons/md';
 
 interface ExtrasProduct {
   id: number;
@@ -232,22 +233,27 @@ export const ExtrasProductsManagement = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ 
+        bgcolor: '#051923',
+        borderRadius: 2,
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+      }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Imagen</TableCell>
-              <TableCell>Título</TableCell>
-              <TableCell>Descripción</TableCell>
-              <TableCell>Precio</TableCell>
-              <TableCell>Categoría</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Imagen</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Título</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Descripción</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Precio</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Categoría</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {products.map((product) => (
               <TableRow key={product.id}>
-                <TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <img
                     src={getImageUrl(product.image_url)}
                     alt={product.title}
@@ -258,17 +264,39 @@ export const ExtrasProductsManagement = () => {
                     }}
                   />
                 </TableCell>
-                <TableCell>{product.title}</TableCell>
-                <TableCell>{product.description}</TableCell>
-                <TableCell>${product.price}</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleEdit(product)} color="primary">
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(product.id)} color="error">
-                    <DeleteIcon />
-                  </IconButton>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>{product.title}</TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>{product.description}</TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>${product.price}</TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>{product.category}</TableCell>
+                <TableCell sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      onClick={() => handleEdit(product)}
+                      sx={{
+                        minWidth: 'auto',
+                        p: 1,
+                        color: '#00bcd4',
+                        '&:hover': {
+                          bgcolor: 'rgba(0, 188, 212, 0.1)'
+                        }
+                      }}
+                    >
+                      <MdEdit />
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(product.id)}
+                      sx={{
+                        minWidth: 'auto',
+                        p: 1,
+                        color: '#f44336',
+                        '&:hover': {
+                          bgcolor: 'rgba(244, 67, 54, 0.1)'
+                        }
+                      }}
+                    >
+                      <MdDelete />
+                    </Button>
+                  </Box>
                 </TableCell>
               </TableRow>
             ))}

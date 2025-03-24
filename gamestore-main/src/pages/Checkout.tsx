@@ -427,6 +427,7 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
   React.useEffect(() => {
     return () => {
       mounted.current = false;
+      console.log('Limpiando estado del componente Payment');
     };
   }, []);
 
@@ -437,6 +438,7 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
       setProcessing(true);
       setError('');
       setSuccess(false);
+      setOrderMessage('');
       
       if (!item.offerId || !item.displayName || !item.price?.finalPrice || !username) {
         setError(t.requiredFields);
@@ -451,10 +453,22 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
       formData.append('username', username);
       
       const paymentProofFile = localStorage.getItem('paymentProof');
-      if (paymentProofFile) {
+      if (!paymentProofFile) {
+        setError(t.requiredFields);
+        setProcessing(false);
+        return;
+      }
+
+      let blob;
+      try {
         const response = await fetch(paymentProofFile);
-        const blob = await response.blob();
+        blob = await response.blob();
         formData.append('payment_receipt', blob, 'payment_receipt.jpg');
+      } catch (error) {
+        console.error('Error al procesar el comprobante de pago:', error);
+        setError(t.requiredFields);
+        setProcessing(false);
+        return;
       }
 
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/db/api/fortnite/orders`, formData, {
@@ -463,38 +477,34 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
         },
       });
 
-      if (mounted.current) {
-        if (response.data.success) {
-          const successMessage = response.data.data.message || t.orderSuccess;
-          setOrderMessage(successMessage);
-          setSuccess(true);
-          setProcessing(false);
-          localStorage.removeItem('paymentProof');
-
-          // Actualizar el estado con los detalles de la orden
-          const orderDetails = response.data.data.order;
-          if (orderDetails) {
-            setOrderMessage(`${t.orderSuccess} - ID: ${orderDetails.id}`);
-          }
-
-          setTimeout(() => {
-            if (mounted.current) {
-              navigate('/', { 
-                state: { 
-                  message: successMessage,
-                  type: 'success'
-                }
-              });
-            }
-          }, 3000);
-        } else {
-          setProcessing(false);
-          setError(response.data.error || t.orderError);
-        }
-      }
-    } catch (error: unknown) {
-      if (mounted.current) {
+      if (response.data.success) {
+        const orderDetails = response.data.data.order;
+        const successMessage = response.data.data.message || t.orderSuccess;
+        
+        // Guardamos la información de éxito en localStorage
+        localStorage.setItem('orderSuccess', JSON.stringify({
+          message: successMessage,
+          orderId: orderDetails.id,
+          username: username,
+          itemName: item.displayName,
+          price: item.price.finalPrice
+        }));
+        
+        // Limpiamos el comprobante de pago
+        localStorage.removeItem('paymentProof');
+        
+        // Redirigimos inmediatamente
+        navigate('/order-success');
+      } else {
         setProcessing(false);
+        setError(response.data.error || t.orderError);
+      }
+    } catch (error) {
+      console.error('Error al procesar la orden:', error);
+      setProcessing(false);
+      if (axios.isAxiosError(error) && error.response) {
+        setError(error.response.data.error || t.orderError);
+      } else {
         setError(t.orderError);
       }
     }
@@ -504,31 +514,6 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-white">{t.confirmOrder}</h2>
       
-      {success && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-          <div className="bg-[#051923] p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-green-900/20 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">{t.orderSuccess}</h3>
-              <div className="bg-[#051923] border border-gray-700 p-4 rounded-xl mb-4">
-                <div className="text-left space-y-2">
-                  <p className="text-gray-300"><span className="font-medium text-white">{t.fortniteUsername}:</span> {username}</p>
-                  <p className="text-gray-300"><span className="font-medium text-white">{t.item}:</span> {item.displayName}</p>
-                  <p className="text-gray-300"><span className="font-medium text-white">{t.price}:</span> {item.price.finalPrice} {t.vbucks}</p>
-                  <p className="text-gray-300"><span className="font-medium text-white">{t.status}:</span> <span className="text-green-400">{t.orderSuccess}</span></p>
-                </div>
-              </div>
-              <p className="text-gray-300 mb-2">{orderMessage}</p>
-              <p className="text-gray-400 text-sm mt-4">{t.redirecting}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {error && (
         <div className="bg-red-900/20 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-4">
           <span className="block sm:inline">{error}</span>

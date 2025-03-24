@@ -206,7 +206,7 @@ export const GameProductsManagement = () => {
         sx={{ 
           p: 3, 
           mb: 4, 
-          backgroundColor: 'rgba(26, 32, 44, 0.7)',
+          backgroundColor: '#051923',
           backdropFilter: 'blur(10px)',
           borderRadius: '16px',
           border: '1px solid rgba(255, 255, 255, 0.1)'
@@ -220,7 +220,7 @@ export const GameProductsManagement = () => {
           gap: 2
         }}>
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, color: 'white' }}>
               Gestión de Productos de Juegos
             </Typography>
             <Typography variant="body2" sx={{ color: '#a0aec0' }}>
@@ -240,12 +240,31 @@ export const GameProductsManagement = () => {
                     borderColor: 'rgba(255, 255, 255, 0.2)',
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#3182ce',
+                    borderColor: '#00bcd4',
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#3182ce',
+                    borderColor: '#00bcd4',
                   },
-                  backgroundColor: 'rgba(26, 32, 44, 0.4)',
+                  backgroundColor: '#051923',
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      bgcolor: '#051923',
+                      '& .MuiMenuItem-root': {
+                        color: 'white',
+                        '&:hover': {
+                          bgcolor: 'rgba(0, 188, 212, 0.1)',
+                        },
+                        '&.Mui-selected': {
+                          bgcolor: 'rgba(0, 188, 212, 0.2)',
+                          '&:hover': {
+                            bgcolor: 'rgba(0, 188, 212, 0.3)',
+                          }
+                        }
+                      }
+                    }
+                  }
                 }}
               >
                 <MenuItem value="supercell">Supercell</MenuItem>
@@ -261,13 +280,13 @@ export const GameProductsManagement = () => {
                 setOpen(true);
               }}
               sx={{
-                backgroundColor: '#3182ce',
+                backgroundColor: '#00bcd4',
                 color: '#fff',
                 px: 3,
                 py: 1,
                 borderRadius: '8px',
                 '&:hover': {
-                  backgroundColor: '#2c5282'
+                  backgroundColor: '#00838f'
                 }
               }}
             >
@@ -284,7 +303,7 @@ export const GameProductsManagement = () => {
               height: '100%',
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: 'rgba(26, 32, 44, 0.7)',
+              backgroundColor: '#051923',
               backdropFilter: 'blur(10px)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '16px',
@@ -292,14 +311,14 @@ export const GameProductsManagement = () => {
               '&:hover': {
                 transform: 'translateY(-4px)',
                 boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: '#3182ce'
+                borderColor: '#00bcd4'
               }
             }}>
               <Box sx={{ 
                 position: 'relative',
                 width: '100%',
                 paddingTop: '100%',
-                backgroundColor: 'rgba(248, 249, 250, 0.1)',
+                backgroundColor: 'rgba(0, 0, 0, 0.2)',
                 borderRadius: '16px 16px 0 0',
                 overflow: 'hidden'
               }}>
@@ -335,47 +354,6 @@ export const GameProductsManagement = () => {
                     <ImageIcon sx={{ fontSize: 60, color: 'rgba(255, 255, 255, 0.2)' }} />
                   </Box>
                 )}
-                {product.profile_image_url && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      bottom: '1rem',
-                      right: '1rem',
-                      width: '4rem',
-                      height: '4rem',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      border: '3px solid rgba(255, 255, 255, 0.9)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                      transition: 'transform 0.3s ease',
-                      '&:hover': {
-                        transform: 'scale(1.1)'
-                      }
-                    }}
-                  >
-                    <img
-                      src={`${API_URL}/db${product.profile_image_url}`}
-                      alt="Perfil"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  </Box>
-                )}
-                <Chip
-                  label={product.game_type.toUpperCase()}
-                  sx={{
-                    position: 'absolute',
-                    top: '1rem',
-                    left: '1rem',
-                    backgroundColor: 'rgba(49, 130, 206, 0.9)',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    backdropFilter: 'blur(4px)'
-                  }}
-                />
               </Box>
               <CardContent sx={{ flexGrow: 1, p: 3 }}>
                 <Typography 
@@ -386,7 +364,8 @@ export const GameProductsManagement = () => {
                     fontWeight: 'bold',
                     fontSize: '1.1rem',
                     lineHeight: 1.2,
-                    mb: 2
+                    mb: 2,
+                    color: '#00bcd4'
                   }}
                 >
                   {product.title}
@@ -409,7 +388,7 @@ export const GameProductsManagement = () => {
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    color: '#3182ce',
+                    color: 'white',
                     fontWeight: 'bold',
                     fontSize: '1.4rem'
                   }}
@@ -422,9 +401,9 @@ export const GameProductsManagement = () => {
                 <IconButton 
                   onClick={() => handleEdit(product)}
                   sx={{ 
-                    color: '#3182ce',
+                    color: '#00bcd4',
                     '&:hover': {
-                      backgroundColor: 'rgba(49, 130, 206, 0.1)'
+                      backgroundColor: 'rgba(0, 188, 212, 0.1)'
                     }
                   }}
                 >
@@ -433,9 +412,9 @@ export const GameProductsManagement = () => {
                 <IconButton 
                   onClick={() => handleDelete(product.id)}
                   sx={{ 
-                    color: '#e53e3e',
+                    color: '#f44336',
                     '&:hover': {
-                      backgroundColor: 'rgba(229, 62, 62, 0.1)'
+                      backgroundColor: 'rgba(244, 67, 54, 0.1)'
                     }
                   }}
                 >

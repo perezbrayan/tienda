@@ -156,33 +156,18 @@ export const FortniteOrdersManagement: React.FC = () => {
     if (receipt) {
       try {
         console.log('Intentando cargar comprobante:', receipt);
-        // Obtener el token del localStorage
-        const token = localStorage.getItem('token');
         
-        // Extraer el nombre del archivo de la ruta
-        const filename = receipt.split('/').pop();
-        console.log('Nombre del archivo:', filename);
+        // Construir la URL directamente usando la ruta de archivos estáticos
+        const imageUrl = `${API_URL}${receipt}`;
+        console.log('URL del comprobante:', imageUrl);
         
-        // Obtener la imagen usando el token
-        const response = await axios.get(`${API_URL}/db/api/fortnite/payment-receipt/${filename}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          responseType: 'blob',
-        });
-
-        console.log('Respuesta recibida:', response.status);
-        
-        // Crear URL para la imagen
-        const imageUrl = URL.createObjectURL(response.data);
         setSelectedReceipt(imageUrl);
         setShowReceiptDialog(true);
       } catch (error: any) {
         console.error('Error al cargar el comprobante:', error);
-        console.error('Detalles del error:', error.response?.data);
         setResponseDialog({
           open: true,
-          message: `Error al cargar el comprobante de pago: ${error.response?.data?.error || error.message}`
+          message: `Error al cargar el comprobante de pago: ${error.message}`
         });
       }
     } else {
@@ -213,71 +198,101 @@ export const FortniteOrdersManagement: React.FC = () => {
   }
 
   return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
+    <Box sx={{ bgcolor: '#051923', p: 3, borderRadius: 2 }}>
+      <Typography variant="h5" gutterBottom sx={{ color: 'white', mb: 3 }}>
         Gestión de Órdenes de Fortnite
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" sx={{ mb: 2, bgcolor: 'rgba(211, 47, 47, 0.1)', color: '#ff8a80' }}>
           {error}
         </Alert>
       )}
 
-      <TableContainer component={Paper}>
+      <TableContainer 
+        component={Paper} 
+        sx={{ 
+          bgcolor: '#051923', 
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: 2,
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Usuario Web</TableCell>
-              <TableCell>Usuario Fortnite</TableCell>
-              <TableCell>Item</TableCell>
-              <TableCell>Precio</TableCell>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Fecha</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>ID</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Usuario Web</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Usuario Fortnite</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Item</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Precio</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Tipo</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Estado</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Fecha</TableCell>
+              <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell>{order.id}</TableCell>
-                <TableCell>{order.user_id ? `ID: ${order.user_id}` : 'No registrado'}</TableCell>
-                <TableCell>
+              <TableRow key={order.id} sx={{ '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.03)' } }}>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>{order.id}</TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  {order.user_id ? `ID: ${order.user_id}` : 'No registrado'}
+                </TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <Chip 
                     label={order.username} 
                     color="primary"
                     size="small"
                     variant="outlined"
+                    sx={{ bgcolor: 'rgba(25, 118, 210, 0.1)' }}
                   />
                 </TableCell>
-                <TableCell>{order.item_name}</TableCell>
-                <TableCell>{order.price} V-Bucks</TableCell>
-                <TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>{order.item_name}</TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>{order.price} V-Bucks</TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <Chip 
                     label={order.is_bundle ? 'Bundle' : 'Item'} 
                     size="small" 
                     color={order.is_bundle ? 'primary' : 'default'}
+                    sx={{ 
+                      bgcolor: order.is_bundle ? 'rgba(25, 118, 210, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+                      color: order.is_bundle ? '#90caf9' : '#a0aec0'
+                    }}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <Chip 
                     label={order.status} 
                     color={getStatusColor(order.status) as any}
                     size="small"
+                    sx={{ 
+                      bgcolor: order.status === 'completed' ? 'rgba(46, 125, 50, 0.1)' :
+                             order.status === 'failed' ? 'rgba(211, 47, 47, 0.1)' :
+                             'rgba(245, 124, 0, 0.1)',
+                      color: order.status === 'completed' ? '#81c784' :
+                            order.status === 'failed' ? '#ff8a80' :
+                            '#ffb74d'
+                    }}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ color: '#a0aec0', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   {new Date(order.created_at).toLocaleString()}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <Button
                     variant="contained"
                     color="info"
                     size="small"
                     onClick={() => handleViewReceipt(order.payment_receipt)}
-                    sx={{ mr: 1 }}
+                    sx={{ 
+                      mr: 1,
+                      bgcolor: 'rgba(2, 136, 209, 0.1)',
+                      color: '#4fc3f7',
+                      '&:hover': {
+                        bgcolor: 'rgba(2, 136, 209, 0.2)'
+                      }
+                    }}
                   >
                     Ver Comprobante
                   </Button>
@@ -289,11 +304,18 @@ export const FortniteOrdersManagement: React.FC = () => {
                         size="small"
                         onClick={() => handleStatusUpdate('completed', order)}
                         disabled={processingOrder === order.id}
-                        sx={{ mr: 1 }}
+                        sx={{ 
+                          mr: 1,
+                          bgcolor: 'rgba(46, 125, 50, 0.1)',
+                          color: '#81c784',
+                          '&:hover': {
+                            bgcolor: 'rgba(46, 125, 50, 0.2)'
+                          }
+                        }}
                       >
                         {processingOrder === order.id ? (
                           <>
-                            <CircularProgress size={20} sx={{ mr: 1 }} />
+                            <CircularProgress size={20} sx={{ mr: 1, color: '#81c784' }} />
                             Procesando...
                           </>
                         ) : (
@@ -309,6 +331,13 @@ export const FortniteOrdersManagement: React.FC = () => {
                           setOpenDialog(true);
                         }}
                         disabled={processingOrder === order.id}
+                        sx={{ 
+                          bgcolor: 'rgba(211, 47, 47, 0.1)',
+                          color: '#ff8a80',
+                          '&:hover': {
+                            bgcolor: 'rgba(211, 47, 47, 0.2)'
+                          }
+                        }}
                       >
                         Falló
                       </Button>
@@ -321,8 +350,18 @@ export const FortniteOrdersManagement: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Marcar orden como fallida</DialogTitle>
+      <Dialog 
+        open={openDialog} 
+        onClose={() => setOpenDialog(false)}
+        PaperProps={{
+          style: {
+            backgroundColor: '#051923',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '16px'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>Marcar orden como fallida</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -332,11 +371,42 @@ export const FortniteOrdersManagement: React.FC = () => {
             variant="outlined"
             value={errorMessage}
             onChange={(e) => setErrorMessage(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.2)',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#ff8a80',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#a0aec0',
+              },
+            }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
-          <Button onClick={() => handleStatusUpdate('failed', selectedOrder as FortniteOrder)} color="error">
+          <Button 
+            onClick={() => setOpenDialog(false)}
+            sx={{ color: '#a0aec0' }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={() => handleStatusUpdate('failed', selectedOrder as FortniteOrder)} 
+            color="error"
+            sx={{ 
+              color: '#ff8a80',
+              '&:hover': {
+                bgcolor: 'rgba(211, 47, 47, 0.1)'
+              }
+            }}
+          >
             Confirmar
           </Button>
         </DialogActions>
@@ -351,8 +421,15 @@ export const FortniteOrdersManagement: React.FC = () => {
         }}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: '#051923',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '16px'
+          }
+        }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>
           {processingOrder ? 'Procesando Orden' : 'Respuesta del Servidor'}
         </DialogTitle>
         <DialogContent>
@@ -361,7 +438,8 @@ export const FortniteOrdersManagement: React.FC = () => {
             sx={{ 
               whiteSpace: 'pre-wrap', 
               wordWrap: 'break-word',
-              bgcolor: '#f5f5f5',
+              bgcolor: 'rgba(0, 0, 0, 0.2)',
+              color: '#a0aec0',
               p: 2,
               borderRadius: 1
             }}
@@ -373,6 +451,7 @@ export const FortniteOrdersManagement: React.FC = () => {
           <Button 
             onClick={() => setResponseDialog({open: false, message: ''})}
             disabled={processingOrder !== null}
+            sx={{ color: '#a0aec0' }}
           >
             Cerrar
           </Button>
@@ -384,8 +463,15 @@ export const FortniteOrdersManagement: React.FC = () => {
         onClose={() => setShowReceiptDialog(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: '#051923',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '16px'
+          }
+        }}
       >
-        <DialogTitle>Comprobante de Pago</DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>Comprobante de Pago</DialogTitle>
         <DialogContent>
           {selectedReceipt && (
             <img
@@ -396,7 +482,10 @@ export const FortniteOrdersManagement: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowReceiptDialog(false)} color="primary">
+          <Button 
+            onClick={() => setShowReceiptDialog(false)} 
+            sx={{ color: '#a0aec0' }}
+          >
             Cerrar
           </Button>
         </DialogActions>

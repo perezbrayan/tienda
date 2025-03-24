@@ -860,126 +860,45 @@ const FortniteShop: React.FC = () => {
     }
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-7xl mx-auto">
-        {filteredItems.map((item) => {
-          const rarityColor = RARITY_COLORS[item.rarity?.id?.toLowerCase() as keyof typeof RARITY_COLORS] || RARITY_COLORS.default;
-          
-          return (
-            <div 
-              key={item.mainId}
-              className={`group bg-[#051923]/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col transform hover:-translate-y-1 hover:scale-[1.02] relative border border-white/10`}
-            >
-              {/* Efecto de brillo en hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0" style={{
-                background: `linear-gradient(45deg, ${rarityColor}00, ${rarityColor}40, ${rarityColor}00)`,
-                backgroundSize: '200% 200%',
-                animation: 'shimmer 2s linear infinite'
-              }} />
-
-              {/* Contenedor de imagen y descuento */}
-              <div className="relative w-full aspect-square bg-black/20 flex items-center justify-center z-10">
-                {/* Etiqueta de rareza */}
-                <div className="absolute top-0 right-0 bg-black/60 text-white px-3 py-1 text-xs font-medium rounded-bl-lg z-20">
-                  {item.rarity?.name || 'Normal'}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {filteredItems.map((item) => (
+          <div
+            key={item.mainId}
+            className="bg-[#051923] rounded-xl overflow-hidden border border-gray-700/50 group hover:border-primary-500/50 transition-all duration-300"
+          >
+            <div className="relative aspect-square">
+              <img
+                src={item.displayAssets[0]?.full_background}
+                alt={item.displayName}
+                className="w-full h-full object-cover"
+              />
+              {item.rarity && (
+                <div className="absolute top-2 right-2 px-2 py-1 rounded-lg bg-black/80 text-xs font-medium text-white">
+                  {item.rarity.name}
                 </div>
-
-                {/* Etiqueta de descuento */}
-                {item.price.regularPrice > item.price.finalPrice && (
-                  <div className="absolute top-0 left-0 bg-green-500 text-white px-3 py-1 text-xs font-medium rounded-br-lg z-20">
-                    {Math.round((1 - item.price.finalPrice/item.price.regularPrice) * 100)}% OFF
-                  </div>
-                )}
-                
-                {/* Imagen principal */}
-                <img
-                  src={
-                    getValidImageUrl(item.displayAssets?.[0]?.full_background) ||
-                    getValidImageUrl(item.displayAssets?.[0]?.background) ||
-                    getValidImageUrl(item.granted?.[0]?.images?.icon) ||
-                    '/placeholder-image.jpg'
-                  }
-                  alt={item.displayName}
-                  className="h-full w-full object-contain p-2"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    if (!target.src.includes('/placeholder-image.jpg')) {
-                      target.src = '/placeholder-image.jpg';
-                    }
-                  }}
-                />
-              </div>
-
-              {/* Contenido del bundle */}
-              <div className="p-4 flex flex-col gap-3 relative z-10">
-                {/* Título del bundle */}
-                <h3 className="text-lg font-bold text-white line-clamp-1">
-                  {item.displayName}
-                </h3>
-
-                {/* Items incluidos */}
-                <div className="flex flex-wrap gap-1">
-                  {item.granted?.slice(0, 3).map((grantedItem, index) => (
-                    <div key={index} className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1">
-                      <div className="w-4 h-4 rounded-full bg-black/30 overflow-hidden flex-shrink-0">
-                        <img 
-                          src={getValidImageUrl(grantedItem.images?.icon) || '/placeholder-image.jpg'}
-                          alt={grantedItem.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <span className="text-white/90 text-xs font-medium line-clamp-1">
-                        {grantedItem.name}
-                      </span>
-                    </div>
-                  ))}
-                  {item.granted && item.granted.length > 3 && (
-                    <button
-                      onClick={() => toggleItemExpansion(item.mainId, item)}
-                      className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-0.5 text-white/90 text-xs font-medium hover:bg-black/30 transition-colors"
-                    >
-                      +{item.granted.length - 3} más
-                    </button>
-                  )}
-                </div>
-
-                {/* Precio y botón */}
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-white text-xl font-bold">
-                      {formatPrice(item.price.finalPrice)}
-                    </span>
-                    {item.price.regularPrice > item.price.finalPrice && (
-                      <span className="text-gray-400 line-through text-sm">
-                        {formatPrice(item.price.regularPrice)}
-                      </span>
-                    )}
-                  </div>
-                  
-                  <button
-                    onClick={() => handleAddToCart(item)}
-                    className={`px-3 py-1.5 bg-primary-500 text-white rounded-lg font-medium text-sm hover:bg-primary-600 transition-colors flex items-center gap-1.5 ${
-                      hasItems && getItemQuantity(item.mainId) === 0
-                        ? 'opacity-50 cursor-not-allowed'
-                        : ''
-                    }`}
-                    disabled={hasItems && getItemQuantity(item.mainId) === 0}
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    {getItemQuantity(item.mainId) > 0 ? (
-                      <span className="bg-primary-700 px-1.5 rounded-full text-xs">
-                        {getItemQuantity(item.mainId)}
-                      </span>
-                    ) : (
-                      'Añadir'
-                    )}
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
-          );
-        })}
+            <div className="p-4">
+              <h3 className="text-lg font-semibold text-white">{item.displayName}</h3>
+              <p className="text-sm text-gray-400 mt-1 line-clamp-2">{item.displayDescription}</p>
+              <div className="mt-4 space-y-1">
+                <p className="text-xl font-bold text-primary-400">
+                  {item.price.finalPrice.toLocaleString()} V-Bucks
+                </p>
+                <p className="text-sm text-gray-300">
+                  {formatPrice(item.price.finalPrice)}
+                </p>
+              </div>
+              <button
+                onClick={() => handleAddToCart(item)}
+                className="mt-4 w-full px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {t.addToCart}
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     );
   };
@@ -1408,7 +1327,14 @@ const FortniteShop: React.FC = () => {
               <div>
                 <h3 className="text-xl font-semibold text-white">{selectedProduct.title}</h3>
                 <p className="text-gray-400 mt-1">{selectedProduct.description}</p>
-                <p className="text-2xl font-bold text-primary-400 mt-2">${formatPrice(selectedProduct.price)}</p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-2xl font-bold text-primary-400">
+                    {selectedProduct.price ? `${selectedProduct.price.toLocaleString()} V-Bucks` : ''}
+                  </p>
+                  <p className="text-lg text-gray-300">
+                    {selectedProduct.price ? formatPrice(selectedProduct.price) : ''}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -1556,7 +1482,14 @@ const FortniteShop: React.FC = () => {
               <div>
                 <h3 className="text-xl font-semibold text-white">{selectedProduct.title}</h3>
                 <p className="text-gray-400 mt-1">{selectedProduct.description}</p>
-                <p className="text-2xl font-bold text-yellow-400 mt-2">${formatPrice(selectedProduct.price)}</p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-2xl font-bold text-yellow-400">
+                    {selectedProduct.price ? `${selectedProduct.price.toLocaleString()} V-Bucks` : ''}
+                  </p>
+                  <p className="text-lg text-gray-300">
+                    {selectedProduct.price ? formatPrice(selectedProduct.price) : ''}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -1708,7 +1641,14 @@ const FortniteShop: React.FC = () => {
               <div>
                 <h3 className="text-xl font-semibold text-white">{selectedProduct.title}</h3>
                 <p className="text-gray-400 mt-1">{selectedProduct.description}</p>
-                <p className="text-2xl font-bold text-purple-400 mt-2">${formatPrice(selectedProduct.price)}</p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-2xl font-bold text-purple-400">
+                    {selectedProduct.price ? `${selectedProduct.price.toLocaleString()} V-Bucks` : ''}
+                  </p>
+                  <p className="text-lg text-gray-300">
+                    {selectedProduct.price ? formatPrice(selectedProduct.price) : ''}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -1930,7 +1870,14 @@ const FortniteShop: React.FC = () => {
               <div>
                 <h3 className="text-xl font-semibold text-white">{selectedProduct.title}</h3>
                 <p className="text-gray-400 mt-1">{selectedProduct.description}</p>
-                <p className="text-2xl font-bold text-emerald-400 mt-2">${formatPrice(selectedProduct.price)}</p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-2xl font-bold text-emerald-400">
+                    {selectedProduct.price ? `${selectedProduct.price.toLocaleString()} V-Bucks` : ''}
+                  </p>
+                  <p className="text-lg text-gray-300">
+                    {selectedProduct.price ? formatPrice(selectedProduct.price) : ''}
+                  </p>
+                </div>
               </div>
             </div>
 

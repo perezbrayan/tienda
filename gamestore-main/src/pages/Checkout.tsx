@@ -38,6 +38,26 @@ interface PaymentProps {
   onBack: () => void;
 }
 
+const formatPrice = (vbucksPrice: number, currency: 'GTQ' | 'USD' | 'COP') => {
+  // Convertimos a Quetzales (5 GTQ por cada 100 V-Bucks)
+  const priceInGTQ = (vbucksPrice / 100) * 5;
+  
+  switch (currency) {
+    case 'GTQ':
+      return `Q${priceInGTQ.toFixed(2)}`;
+    case 'USD':
+      // 1 GTQ = 0.128 USD aproximadamente
+      const priceInUSD = priceInGTQ * 0.128;
+      return `$${priceInUSD.toFixed(2)}`;
+    case 'COP':
+      // 1 GTQ = 500 COP aproximadamente
+      const priceInCOP = priceInGTQ * 500;
+      return `$${priceInCOP.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    default:
+      return `${vbucksPrice.toLocaleString()} V-Bucks`;
+  }
+};
+
 const CheckoutSteps = ({ currentStep, isAuthenticated }: { currentStep: number, isAuthenticated: boolean }) => {
   const { language } = useLanguage();
   const t = translations[language];
@@ -97,6 +117,19 @@ const OrderSummary = ({ item, onContinue }: OrderSummaryProps) => {
   const { items: cartItems } = useCart();
   const { language } = useLanguage();
   const t = translations[language];
+  const [selectedCurrency, setSelectedCurrency] = useState<'GTQ' | 'USD' | 'COP'>('GTQ');
+
+  useEffect(() => {
+    const handleCurrencyChange = (event: CustomEvent<'GTQ' | 'USD' | 'COP'>) => {
+      setSelectedCurrency(event.detail);
+    };
+
+    window.addEventListener('currencyChanged', handleCurrencyChange as EventListener);
+
+    return () => {
+      window.removeEventListener('currencyChanged', handleCurrencyChange as EventListener);
+    };
+  }, []);
 
   const handleBack = () => {
     if (cartItems.length > 0) {
@@ -127,9 +160,14 @@ const OrderSummary = ({ item, onContinue }: OrderSummaryProps) => {
               <span>{t.specialGift}</span>
             </div>
             <p className="text-gray-300">{t.quantity}: 1</p>
-            <div className="flex items-center gap-2">
-              <span className="text-3xl font-bold text-primary-400">{item.price.finalPrice}</span>
-              <span className="text-gray-300">{t.vbucks}</span>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-3xl font-bold text-primary-400">{item.price.finalPrice}</span>
+                <span className="text-gray-300">{t.vbucks}</span>
+              </div>
+              <div className="text-gray-300">
+                {formatPrice(item.price.finalPrice, selectedCurrency)}
+              </div>
             </div>
           </div>
         </div>
@@ -372,19 +410,18 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
   const { language } = useLanguage();
   const t = translations[language];
   const mounted = React.useRef(true);
+  const [selectedCurrency, setSelectedCurrency] = useState<'GTQ' | 'USD' | 'COP'>('GTQ');
 
-  // Verificar conexión al montar el componente
-  React.useEffect(() => {
-    const verifyConnection = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/db/api/health`);
-        console.log('Estado del servidor:', response.data);
-      } catch (error) {
-        console.error('Error al verificar conexión:', error);
-      }
+  useEffect(() => {
+    const handleCurrencyChange = (event: CustomEvent<'GTQ' | 'USD' | 'COP'>) => {
+      setSelectedCurrency(event.detail);
     };
 
-    verifyConnection();
+    window.addEventListener('currencyChanged', handleCurrencyChange as EventListener);
+
+    return () => {
+      window.removeEventListener('currencyChanged', handleCurrencyChange as EventListener);
+    };
   }, []);
 
   React.useEffect(() => {
@@ -397,13 +434,11 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
     if (processing) return;
 
     try {
-      console.log('Iniciando proceso de pago...');
       setProcessing(true);
       setError('');
       setSuccess(false);
       
       if (!item.offerId || !item.displayName || !item.price?.finalPrice || !username) {
-        console.log('Faltan campos requeridos:', { item, username });
         setError(t.requiredFields);
         setProcessing(false);
         return;
@@ -417,16 +452,10 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
       
       const paymentProofFile = localStorage.getItem('paymentProof');
       if (paymentProofFile) {
-        console.log('Procesando comprobante de pago...');
         const response = await fetch(paymentProofFile);
         const blob = await response.blob();
         formData.append('payment_receipt', blob, 'payment_receipt.jpg');
       }
-
-      console.log('Enviando solicitud al servidor...', {
-        url: `${import.meta.env.VITE_API_URL}/db/api/fortnite/orders`,
-        formData: Object.fromEntries(formData.entries())
-      });
 
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/db/api/fortnite/orders`, formData, {
         headers: {
@@ -434,26 +463,22 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
         },
       });
 
-      console.log('Respuesta del servidor recibida:', response.data);
-
       if (mounted.current) {
-        console.log('Componente montado, procesando respuesta...');
-        
         if (response.data.success) {
-          console.log('Orden creada exitosamente, actualizando estados...');
-          // Primero establecemos el mensaje y luego el éxito
-          const successMessage = response.data.data.message || t.orderProcessing;
-          console.log('Mensaje de éxito:', successMessage);
-          
+          const successMessage = response.data.data.message || t.orderSuccess;
           setOrderMessage(successMessage);
           setSuccess(true);
           setProcessing(false);
           localStorage.removeItem('paymentProof');
 
-          console.log('Estados actualizados, iniciando redirección...');
+          // Actualizar el estado con los detalles de la orden
+          const orderDetails = response.data.data.order;
+          if (orderDetails) {
+            setOrderMessage(`${t.orderSuccess} - ID: ${orderDetails.id}`);
+          }
+
           setTimeout(() => {
             if (mounted.current) {
-              console.log('Redirigiendo a la página principal...');
               navigate('/', { 
                 state: { 
                   message: successMessage,
@@ -463,25 +488,14 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
             }
           }, 3000);
         } else {
-          console.log('Error en la respuesta:', response.data.error);
           setProcessing(false);
           setError(response.data.error || t.orderError);
         }
       }
     } catch (error: unknown) {
-      console.error('Error al crear orden:', error);
-      console.error('Detalles del error:', {
-        message: (error as any).message,
-        response: (error as any).response?.data,
-        status: (error as any).response?.status
-      });
-      
       if (mounted.current) {
         setProcessing(false);
-        setError(
-          ((error as any).response?.data?.error as string) || 
-          t.orderError
-        );
+        setError(t.orderError);
       }
     }
   };
@@ -505,13 +519,10 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
                   <p className="text-gray-300"><span className="font-medium text-white">{t.fortniteUsername}:</span> {username}</p>
                   <p className="text-gray-300"><span className="font-medium text-white">{t.item}:</span> {item.displayName}</p>
                   <p className="text-gray-300"><span className="font-medium text-white">{t.price}:</span> {item.price.finalPrice} {t.vbucks}</p>
-                  <p className="text-gray-300"><span className="font-medium text-white">{t.status}:</span> <span className="text-primary-400">{t.processing}</span></p>
+                  <p className="text-gray-300"><span className="font-medium text-white">{t.status}:</span> <span className="text-green-400">{t.orderSuccess}</span></p>
                 </div>
               </div>
               <p className="text-gray-300 mb-2">{orderMessage}</p>
-              <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden mt-4">
-                <div className="w-1/3 h-full bg-primary-600 animate-[progress_3s_ease-in-out_infinite]"></div>
-              </div>
               <p className="text-gray-400 text-sm mt-4">{t.redirecting}</p>
             </div>
           </div>
@@ -542,17 +553,24 @@ const Payment = ({ item, username, onBack }: PaymentProps) => {
             </div>
             <div className="text-right">
               <p className="font-medium text-white">{item.price.finalPrice} {t.vbucks}</p>
+              <p className="text-sm text-gray-300">{formatPrice(item.price.finalPrice, selectedCurrency)}</p>
             </div>
           </div>
 
           <div className="pt-4">
             <div className="flex justify-between text-sm">
               <span className="text-gray-300">{t.total}</span>
-              <span className="text-white">{item.price.finalPrice} {t.vbucks}</span>
+              <div className="text-right">
+                <span className="text-white">{item.price.finalPrice} {t.vbucks}</span>
+                <p className="text-gray-300">{formatPrice(item.price.finalPrice, selectedCurrency)}</p>
+              </div>
             </div>
             <div className="flex justify-between font-medium text-lg mt-4">
               <span className="text-white">{t.total}</span>
-              <span className="text-primary-400">{item.price.finalPrice} {t.vbucks}</span>
+              <div className="text-right">
+                <span className="text-primary-400">{item.price.finalPrice} {t.vbucks}</span>
+                <p className="text-gray-300">{formatPrice(item.price.finalPrice, selectedCurrency)}</p>
+              </div>
             </div>
           </div>
         </div>
